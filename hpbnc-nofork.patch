@@ -1,0 +1,111 @@
+diff -Nur hpbnc.org/hpbnc.c hpbnc/hpbnc.c
+--- hpbnc.org/hpbnc.c	2004-10-16 20:44:23.000000000 +0000
++++ hpbnc/hpbnc.c	2004-10-16 21:14:03.039973024 +0000
+@@ -22,7 +22,8 @@
+ #define BUFLEN 4096
+ 
+ char rhosts[2048];
+-int lport, idnt;
++char pchroot[2048];
++int lport,idnt,uuid;
+ char pidfile[1024], lbind[256], rbind[256];
+ 
+ #ifdef FIX_IRIX
+@@ -60,8 +61,11 @@
+   char line[2048], label[2048], value[2048], *start;
+ 
+   lport = -1;
++  uuid = 99;
++  
+   strcpy(pidfile, "hpbnc.pid");
+   strcpy(rhosts, "");
++  strcpy(pchroot, "/usr/share/empty");
+   idnt = 0;
+   strcpy(lbind, "");
+   strcpy(rbind, "");
+@@ -95,6 +99,8 @@
+ 	    lport = atoi(value);
+ 	  } else if (!strcasecmp(label, "IDNT")) {
+ 	    idnt = atoi(value);
++	  } else if (!strcasecmp(label, "UUID")) {
++	    uuid = atoi(value);
+ 	  } else if (!strcasecmp(label, "RHOSTS")) {
+ 	    strncpy(rhosts, value, 2047);
+ 	    rhosts[2047] = '\0';
+@@ -104,6 +110,9 @@
+ 	  } else if (!strcasecmp(label, "RBIND")) {
+ 	    strncpy(rbind, value, 255);
+ 	    lbind[255] = '\0';
++	  } else if (!strcasecmp(label, "PCHROOT")) {
++	    strncpy(pchroot,value, 255);
++	    pchroot[255] = '\0';
+ 	  } else if (!strcasecmp(label, "PIDFILE")) {
+ 	    strncpy(pidfile, value, 1023);
+ 	    pidfile[1023] = '\0';
+@@ -279,14 +288,7 @@
+     perror("listen");
+     return 20;
+   }
+-  if ((nbyt = fork()) == -1) {
+-    perror("fork");
+-    return 20;
+-  }
+-  if (nbyt > 0)
+-  {
+-    return 0;
+-  }
++
+   //edit this to fake the processes to whatever you want
+   setproctitle("%s", argv[0]);
+   setsid();
+@@ -303,25 +305,15 @@
+ 
+   if (getuid() == 0) {
+     //   fprintf(stderr,"Running as root... trying to chroot and change uid...");
+-    passw = getpwnam("nobody");
+-    if (passw == NULL) {
+-      fprintf(stderr, "unable to find uid for nobody\n");
+-      return 666;
+-    }
+-    cwd = getcwd(NULL, MAXPATHLEN);
+-    if (!cwd) {
+-      fprintf(stderr, "getcwd() failed\n");
+-      return 30;
+-    }
+-    //had problems with resolving after chroot (/etc/hosts)
+-    /*   printf("chrooting to %s\n",cwd);
+-	 if (chroot(cwd)) {
+-	 fprintf(stderr,"Unable to chroot to %s\n",cwd);
+-	 return 30;
++         printf("chrooting to %s\n",cwd);
++	 if (chroot(pchroot)) {
++	    fprintf(stderr,"Unable to chroot to %s\n",cwd);
++	    return 30;
+ 	 }
+-	 */ printf("changing uid to %d\n", (int)passw->pw_uid);
+-    if (setuid(passw->pw_uid)) {
+-      fprintf(stderr, "Unable to setuid to %d\n", (int)passw->pw_uid);
++    printf("changing uid to %d\n", uuid);
++    
++    if (setuid(uuid)) {
++      fprintf(stderr, "Unable to setuid to %d\n", uuid);
+       return 30;
+     }
+   }
+diff -Nur hpbnc.org/hpbnc.conf hpbnc/hpbnc.conf
+--- hpbnc.org/hpbnc.conf	2003-11-13 12:20:56.000000000 +0000
++++ hpbnc/hpbnc.conf	2004-10-16 21:03:34.200571144 +0000
+@@ -14,7 +14,12 @@
+ #RBIND=
+ 
+ #name of pid file
+-PIDFILE=hpbnc.pid
++PIDFILE=/tmp/hpbnc.pid
++
++PCHROT=/usr/share/empty
++
++#changing uid to
++UUID=99
+ 
+ #--------------------------------------------------------
+ #EOF :)
