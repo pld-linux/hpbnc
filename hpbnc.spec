@@ -1,4 +1,5 @@
-Summary:	ftp port bouncer
+Summary:	FTP port bouncer
+Summary(pl):	Przekazywanie portów FTP
 Name:		hpbnc
 Version:	1.5
 Release:	0.2
@@ -8,24 +9,25 @@ Source0:	http://mobilcom.dyndns.org/~iwdisb/glftpd/%{name}.v%{version}_test2.tar
 # Source0-md5:	cdaf5880e6a4edc1b070fb2375a1f83d
 # Source0-size:	7925
 Patch0:		hpbnc-nofork.patch
-URL:		http://pftp.suxx.sk
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-ftp port bouncer
+FTP port bouncer.
+
+%description -l pl
+Program do przekazywania portów FTP.
 
 %prep
 %setup -q -n %{name}
 %patch0 -p1
 
 %build
-
 %{__cc} %{rpmcflags} %{rpmldflags} -o hpbnc hpbnc.c rfc931.c
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-install -D hpbnc $RPM_BUILD_ROOT/%{_bindir}/hpbnc
+install -D hpbnc $RPM_BUILD_ROOT%{_bindir}/hpbnc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
