@@ -7,7 +7,6 @@ License:	GPL
 Group:		Applications/Networking
 Source0:	http://mobilcom.dyndns.org/~iwdisb/glftpd/%{name}.v%{version}_test2.tar.gz
 # Source0-md5:	cdaf5880e6a4edc1b070fb2375a1f83d
-# Source0-size:	7925
 Patch0:		hpbnc-nofork.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
