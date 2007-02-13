@@ -1,5 +1,5 @@
 Summary:	FTP port bouncer
-Summary(pl.UTF-8):   Przekazywanie portów FTP
+Summary(pl.UTF-8):	Przekazywanie portów FTP
 Name:		hpbnc
 Version:	1.5
 Release:	0.2
